@@ -138,7 +138,6 @@ class PublicResumeView(ModelViewSet):
     
     serializer_class = PublicResumeSerializer
     permission_classes = (AllowAny,)
-    queryset = PublicResume.objects.all()
     
     def retrieve(self, request, pk=None):
         print("Public ID:", pk)

@@ -21,10 +21,6 @@ mimetypes.add_type("text/css", ".css", True)
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Initialise environment variables
-# env = environ.Env(DEBUG=(bool, False))
-# environ.Env.read_env()
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
@@ -37,7 +33,7 @@ DEBUG = str(os.environ.get("DEBUG")) == '1'
 # Security warning issue using "python manage.py check --deploy"
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
-SECURE_SSL_REDIRECT= True
+SECURE_SSL_REDIRECT= False
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 SECURE_HSTS_SECONDS = 60
@@ -46,6 +42,10 @@ ALLOWED_HOSTS = []
 
 if DEBUG:
     ALLOWED_HOSTS += [os.environ.get("ALLOWED_HOSTS")]
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+    SECURE_SSL_REDIRECT= False
+    SECURE_HSTS_PRELOAD = False
 
 # Application definition
 INSTALLED_APPS = [
@@ -57,8 +57,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
-    'main.apps.MainConfig',
-    "resume.apps.ResumeConfig",
+    "main",
+    "resume",
+    # 'main.apps.MainConfig',
+    # "resume.apps.ResumeConfig",
     'rest_framework_simplejwt.token_blacklist',
 ]
 
@@ -106,17 +108,17 @@ DATABASES = {
     },
 }
 
-# if DEBUG == False:
-#     DATABASES = {
-#         'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': os.environ.get("POSTGRES_DB"),
-#         'USER': os.environ.get("POSTGRES_USER"),
-#         'PASSWORD': os.environ.get("POSTGRES_PASSWORD"),
-#         'HOST': os.environ.get("POSTGRES_HOST"),
-#         'PORT': os.environ.get("POSTGRES_PORT"),
-#     }
-# }
+if True:
+    DATABASES = {
+        'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': os.environ.get("POSTGRES_DB"),
+        'USER': os.environ.get("POSTGRES_USER"),
+        'PASSWORD': os.environ.get("POSTGRES_PASSWORD"),
+        'HOST': os.environ.get("POSTGRES_HOST"),
+        'PORT': os.environ.get("POSTGRES_PORT"),
+    }
+}
         
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
