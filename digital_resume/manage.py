@@ -8,11 +8,16 @@ from pathlib import Path
 def main():
     """Run administrative tasks."""
     DOT_ENV_PATH = Path().resolve() / "digital_resume"  / ".env"
-    if DOT_ENV_PATH.exists(): 
-        print("Reading .env file...")
-        dotenv.load_dotenv(str(DOT_ENV_PATH))
-    else:
-        print(f"No .env found in {DOT_ENV_PATH}, be sure to make it.")
+    DOT_ENV_PATH2 = Path().resolve() / "digital_resume"  / "digital_resume" / ".env"
+    env_paths = [DOT_ENV_PATH, DOT_ENV_PATH2]
+    
+    for env_path in env_paths:        
+        if env_path.exists():
+            print("Reading .env file...")
+            dotenv.load_dotenv(str(env_path))
+            break
+        else:
+            print(f"No .env found in {env_path}, be sure to make it.")
         
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'digital_resume.settings')
     
