@@ -7,9 +7,9 @@ from pathlib import Path
 
 def main():
     """Run administrative tasks."""
-    DOT_ENV_PATH = Path() / ".env"
-    
+    DOT_ENV_PATH = Path() / "digital_resume" / ".env"
     if DOT_ENV_PATH.exists(): 
+        print("Reading .env file...")
         dotenv.load_dotenv(str(DOT_ENV_PATH))
     else:
         print("No .env found, be sure to make it.")
