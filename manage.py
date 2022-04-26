@@ -7,9 +7,9 @@ from pathlib import Path
 
 def main():
     """Run administrative tasks."""
-    DOT_ENV_PATH = Path().resolve() / "digital_resume"  / ".env"
-    DOT_ENV_PATH2 = Path().resolve() / "digital_resume"  / "digital_resume" / ".env"
-    env_paths = [DOT_ENV_PATH, DOT_ENV_PATH2]
+    DOT_ENV_PATH = Path().resolve()  / "digital_resume/.env"
+    # DOT_ENV_PATH2 = Path().resolve() / "digital_resume"  / "digital_resume" / ".env"
+    env_paths = [DOT_ENV_PATH]
     
     for env_path in env_paths:        
         if env_path.exists():
