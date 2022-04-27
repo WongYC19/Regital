@@ -157,9 +157,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / "static"
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-STATICFILES_DIRS = [BASE_DIR / "static", ]
+# STATICFILES_STORAGE =  'django.contrib.staticfiles.storage.StaticFilesStorage' 
+
+STATICFILES_DIRS = (STATIC_ROOT, )
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "static")
 MEDIA_URL = "/images/"
