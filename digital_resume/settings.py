@@ -46,6 +46,8 @@ if DEBUG:
     CSRF_COOKIE_SECURE = False
     SECURE_SSL_REDIRECT= False
     SECURE_HSTS_PRELOAD = False
+else:
+    ALLOWED_HOSTS = ["https://regital.herokuapp.com", 'localhost', '127.0.1:8000/']
 
 # Application definition
 INSTALLED_APPS = [
