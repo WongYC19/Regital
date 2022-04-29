@@ -249,10 +249,6 @@ PASSWORD_RESET_TIMEOUT = 300 # seconds
 # DJANGO_REST_MULTITOKENAUTH_RESET_TOKEN_EXPIRY_TIME = .25
 # DJANGO_REST_PASSWORDRESET_NO_INFORMATION_LEAKAGE = False #  will return even if the user doesn't exist in the database if True"
 
-# Configure Django App for Heroku.
-import django_heroku
-django_heroku.settings(locals())
-
 options = DATABASES['default'].get('OPTIONS', {})
 options.pop('sslmode', None)
 
@@ -260,3 +256,7 @@ options.pop('sslmode', None)
 import dj_database_url
 db_from_env = dj_database_url.config(conn_max_age=500)
 DATABASES['default'].update(db_from_env)
+
+# Configure Django App for Heroku.
+import django_heroku
+django_heroku.settings(locals())
