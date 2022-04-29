@@ -2,7 +2,7 @@ import axios from "axios";
 import TokenService from "./token.service";
 import AuthService from "./auth.service";
 
-export const API_URL = "http://127.0.0.1:8000/";
+export const API_URL = "/"; // "http://127.0.0.1:8000/";
 
 const apiEndpoints = {
   register: "api/register/",
@@ -18,7 +18,7 @@ const apiEndpoints = {
   users: "users/",
   permission: "permission/",
   view: "view/",
-  sharedResume: "shared_resume/"
+  sharedResume: "shared_resume/",
 };
 
 const api = axios.create({
