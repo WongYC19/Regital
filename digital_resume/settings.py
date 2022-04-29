@@ -162,7 +162,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # STATICFILES_STORAGE =  'django.contrib.staticfiles.storage.StaticFilesStorage' 
 
-STATICFILES_DIRS = (STATIC_ROOT, os.path.join(BASE_DIR, "build/static"))
+STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"), os.path.join(BASE_DIR, "build/static"))
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "static")
 MEDIA_URL = "/images/"
