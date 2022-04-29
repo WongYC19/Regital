@@ -12,7 +12,7 @@ export function camelToSnake(camelCase) {
 
 export function snakeToCamelObject(obj) {
   const newObj = {};
-  Object.entries(obj).forEach((item) => {
+  Object.entries(obj ?? {}).forEach((item) => {
     const [key, value] = item;
     const newKey = snakeToCamel(key);
     newObj[newKey] = value;
