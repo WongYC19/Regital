@@ -41,7 +41,7 @@ SECURE_HSTS_SECONDS = 60
 ALLOWED_HOSTS = []
 
 if DEBUG:
-    ALLOWED_HOSTS += [os.environ.get("ALLOWED_HOSTS")]
+    ALLOWED_HOSTS += [os.environ.get("ALLOWED_HOSTS"), "localhost:3000"]
     SESSION_COOKIE_SECURE = False
     CSRF_COOKIE_SECURE = False
     SECURE_SSL_REDIRECT= False
@@ -84,7 +84,7 @@ ROOT_URLCONF = 'digital_resume.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR, os.path.join(BASE_DIR, 'build')],
+        'DIRS': [os.path.join(BASE_DIR, 'build')],
         
         'APP_DIRS': True,
         'OPTIONS': {
