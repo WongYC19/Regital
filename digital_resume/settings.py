@@ -84,7 +84,7 @@ ROOT_URLCONF = 'digital_resume.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'build'), os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [BASE_DIR, os.path.join(BASE_DIR, 'build'), os.path.join(BASE_DIR, 'templates')],
         
         'APP_DIRS': True,
         'OPTIONS': {
