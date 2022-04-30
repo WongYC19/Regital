@@ -47,7 +47,7 @@ if DEBUG:
     SECURE_SSL_REDIRECT= False
     SECURE_HSTS_PRELOAD = False
 else:
-    ALLOWED_HOSTS = ["https://regital.herokuapp.com", 'localhost', '127.0.1:8000/']
+    ALLOWED_HOSTS = ["https://regital.herokuapp.com", 'localhost:5000', '127.0.1:3000/']
 
 # Application definition
 INSTALLED_APPS = [
