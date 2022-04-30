@@ -23,7 +23,7 @@ from django.conf.urls.static import static
 
 react_urls = ["", "resume", "shared_resume", "shared_resume/view/<str:uid>", "resume/<str:uid>", "profile", "view/<str:uid>", "login", "signup", "password_reset", "password_reset_confirm", "password_reset_confirm/<str:uid>/<str:token>", "password_reset_done"]
 
-react_url_patterns = [path(url, TemplateView.as_view(template_name="build/index.html")) for url in react_urls]
+react_url_patterns = [path(url + "/", TemplateView.as_view(template_name="build/index.html")) for url in react_urls]
 
 urlpatterns = react_url_patterns + [
     path('admin/', admin.site.urls),
