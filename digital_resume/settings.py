@@ -191,9 +191,13 @@ AUTH_USER_MODEL = "main.CustomUser"
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOWED_ORIGINS = []
 
+CORS_ALLOWED_ORIGINS += [
+    os.environ.get("FRONTEND_ORIGIN"),
+    os.environ.get("BACKEND_ORIGIN")
+]
+
 if DEBUG:
-    CORS_ALLOWED_ORIGINS += [os.environ.get("FRONTEND_ORIGIN"),
-    os.environ.get("BACKEND_ORIGIN", "http://localhost:3000")]
+    CORS_ALLOWED_ORIGINS += ["https://regital.herokuapp.com"]
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
