@@ -97,7 +97,7 @@ function TemplateList() {
   useEffect(() => {
     async function getTemplateList() {
       const response = await api.get(api.endpoints["templates"]);
-      setTemplateList(response.data);
+      setTemplateList(response.data ?? []);
       setLoading(false);
     }
 
