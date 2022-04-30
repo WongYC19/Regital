@@ -13,12 +13,12 @@ const apiEndpoints = {
   resetPassword: "api/reset_password/",
   resetPasswordConfirm: "api/reset_password_confirm/",
   csrftoken: "api/get_csrf_token/",
-  templates: "templates/",
-  resume: "resume/",
-  users: "users/",
-  permission: "permission/",
-  view: "view/",
-  sharedResume: "shared_resume/",
+  templates: "api/templates/",
+  resume: "api/resume/",
+  users: "api/users/",
+  permission: "api/permission/",
+  view: "api/view/",
+  sharedResume: "api/shared_resume/",
 };
 
 const api = axios.create({

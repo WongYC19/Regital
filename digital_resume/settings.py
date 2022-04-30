@@ -193,10 +193,7 @@ CORS_ALLOWED_ORIGINS = []
 
 if DEBUG:
     CORS_ALLOWED_ORIGINS += [os.environ.get("FRONTEND_ORIGIN"),
-    os.environ.get("BACKEND_ORIGIN", "localhost:3000")]
-
-print("CORS Allowed Origin:", CORS_ALLOWED_ORIGINS)
-
+    os.environ.get("BACKEND_ORIGIN", "http://localhost:3000")]
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),

@@ -11,5 +11,5 @@ router.register("templates", TemplateListView, basename="templates")
 router.register("users", UserView, basename="users")
 
 urlpatterns = [
-    path("", include(router.urls)),
+    path("api/", include(router.urls)),
 ]
