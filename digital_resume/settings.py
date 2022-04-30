@@ -41,13 +41,13 @@ SECURE_HSTS_SECONDS = 60
 ALLOWED_HOSTS = []
 
 if DEBUG:
-    ALLOWED_HOSTS += [os.environ.get("ALLOWED_HOSTS"), "localhost:3000"]
+    ALLOWED_HOSTS += [os.environ.get("ALLOWED_HOSTS"), 'localhost:3000', '127.0.1:3000']
     SESSION_COOKIE_SECURE = False
     CSRF_COOKIE_SECURE = False
     SECURE_SSL_REDIRECT= False
     SECURE_HSTS_PRELOAD = False
 else:
-    ALLOWED_HOSTS = ["https://regital.herokuapp.com", 'localhost:5000', '127.0.1:3000/']
+    ALLOWED_HOSTS = ["https://regital.herokuapp.com", 'localhost:3000', '127.0.1:3000']
 
 # Application definition
 INSTALLED_APPS = [
@@ -84,7 +84,7 @@ ROOT_URLCONF = 'digital_resume.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, "build")],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
