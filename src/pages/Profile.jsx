@@ -28,7 +28,6 @@ function ProfileForm() {
   async function updateUserProfile(event) {
     const response = await ProfileService.updateUserProfile(event);
     const data = response.data;
-    console.log("Updated profile data in profile form:", data);
     if (!data) return false;
     TokenService.setAuth(data["token"]); // update token
     setUserProfile((prev) => ({ ...prev, ...data }));
@@ -36,21 +35,16 @@ function ProfileForm() {
 
   async function changeProfilePicture(event) {
     const response = await ProfileService.updateProfilePicture(event);
-    console.log("Response after change profile picture:", response);
     const profilePicture = response.profilePicture;
     if (!profilePicture) return false;
-    console.log("Profile after change:", profilePicture);
-    // userProfile["profile_picture"] = data["profile_picture"];
     setUserProfile((prev) => ({ ...prev, profilePicture }));
     return userProfile;
   }
 
   async function deleteProfilePicture(event) {
     const response = await ProfileService.deleteProfilePicture(event);
-    console.log("Response delete picture:", response);
     if (response.profilePicture) {
       const data = { profilePicture: "/images/profiles" };
-      console.log("Delete picture.");
       setUserProfile((prev) => ({ ...prev, ...data }));
     }
 

@@ -29,8 +29,10 @@ import {
 } from "../components/StyledTable";
 
 import ResumeService from "../services/resume.service";
+import sortData from "../utils/sorter";
+import { openResume, editResume, removeResume } from "../utils/resumeOperation";
 
-function CustomTableHead({ rows, setRows, setAllRows }) {
+function CustomTableHead({ resumeList, setResumeList, setAllResume }) {
   const tableHeadStyle = {
     color: (theme) => theme.palette.primary.main,
     backgroundColor: (theme) => theme.palette.divider,
@@ -47,9 +49,9 @@ function CustomTableHead({ rows, setRows, setAllRows }) {
 
   const handleSortRequest = (field, label) => {
     return () => {
-      const sortedRows = sortData(rows, orderDirection[field], label);
-      setRows(sortedRows);
-      setAllRows(rows);
+      const sortedResume = sortData(resumeList, orderDirection[field], label);
+      setResumeList(sortedResume);
+      setAllResume(resumeList);
       setOrderDirection((prev) => ({
         ...prev,
         [field]: orderDirection[field] === "asc" ? "desc" : "asc",
@@ -103,15 +105,23 @@ function CustomTableHead({ rows, setRows, setAllRows }) {
   );
 }
 
-function CustomTableRows({ rows, openResume, editResume, removeResume }) {
-  rows = rows ?? [];
-  return rows.map((row) => {
+function CustomTableRows({
+  resumeList,
+  setResumeList,
+  openResume,
+  setSelection,
+  editResume,
+  removeResume,
+}) {
+  resumeList = resumeList ?? [];
+  return resumeList.map((row) => {
     const { resume, right, user } = row;
     const {
       created_date: createdDate,
       last_modified_date: lastModifiedDate,
       resume_id: resumeId,
     } = resume;
+
     return (
       <StyledTableRow key={row.id}>
         <StyledTableCell component="td" align="center" scope="row">
@@ -152,7 +162,16 @@ function CustomTableRows({ rows, openResume, editResume, removeResume }) {
 
         <StyledTableCell component="td" align="center" scope="row">
           <IconButton
-            onClick={right >= 2 ? removeResume(resumeId) : null}
+            onClick={
+              right >= 2
+                ? removeResume({
+                    resumeList,
+                    setResumeList,
+                    setSelection,
+                    resumeId,
+                  })
+                : null
+            }
             disabled={right < 2}
           >
             <DeleteForeverIcon />
@@ -165,8 +184,8 @@ function CustomTableRows({ rows, openResume, editResume, removeResume }) {
 
 export default function SharedResumeList() {
   const [searched, setSearched] = useState("");
-  const [rows, setRows] = useState([]);
-  const [allRows, setAllRows] = useState([]);
+  const [resumeList, setResumeList] = useState([]);
+  const [allResume, setAllResume] = useState([]);
   const [selection, setSelection] = useState({
     severity: "info",
     message: null,
@@ -176,12 +195,12 @@ export default function SharedResumeList() {
     setSearched(searchedVal);
 
     if (searchedVal === "") {
-      setRows(allRows);
+      setResumeList(allResume);
       return false;
     }
     const pattern = new RegExp(searchedVal, "gi");
-    const filteredRows = rows.filter((row) => row.user.match(pattern));
-    setRows(filteredRows);
+    const filteredRows = resumeList.filter((row) => row.user.match(pattern));
+    setResumeList(filteredRows);
   };
 
   const cancelSearch = () => {
@@ -189,48 +208,11 @@ export default function SharedResumeList() {
     requestSearch("");
   };
 
-  const removeResume = (resumeId) => {
-    return (event) => {
-      const confirmDelete = window.confirm(
-        "Are you sure to delete the resume? Deleted resume can't be recovered."
-      );
-
-      if (!confirmDelete) return false;
-
-      const response = ResumeService.deleteResume(resumeId);
-
-      response
-        .then((data) => {
-          const updatedAllRows = allRows.filter(
-            (row) => row.resume.id !== resumeId
-          );
-
-          const updatedRows = rows.filter((row) => row.resume.id !== resumeId);
-
-          setAllRows(updatedAllRows);
-          setRows(updatedRows);
-          setSelection((prev) => ({
-            ...prev,
-            severity: "success",
-            message: data,
-          }));
-        })
-        .catch((error) => {
-          console.error("Error:", error.message);
-          setSelection((prev) => ({
-            ...prev,
-            severity: "error",
-            message: error.message,
-          }));
-        });
-    };
-  };
-
   useEffect(() => {
     async function getSharedResume() {
       const response = await ResumeService.getSharedResume();
-      setAllRows(response ?? []);
-      setRows(response);
+      setAllResume(response ?? []);
+      setResumeList(response);
     }
 
     getSharedResume();
@@ -271,14 +253,23 @@ export default function SharedResumeList() {
             component={Grid}
           >
             <Table stickyHeader={true}>
-              <CustomTableHead {...{ rows, setRows, setAllRows }} />
+              <CustomTableHead
+                {...{ resumeList, setResumeList, setAllResume }}
+              />
 
               <TableBody>
-                {rows.length === 0 ? (
+                {resumeList.length === 0 ? (
                   <StyledEmptyRows columnCounts={6} />
                 ) : (
                   <CustomTableRows
-                    {...{ rows, openResume, editResume, removeResume }}
+                    {...{
+                      resumeList,
+                      setResumeList,
+                      openResume,
+                      editResume,
+                      removeResume,
+                      setSelection,
+                    }}
                   />
                 )}
               </TableBody>
@@ -290,34 +281,42 @@ export default function SharedResumeList() {
   );
 }
 
-const openResume = (resumeId) => {
-  return (event) => {
-    const win = window.open(`/shared_resume/view/${resumeId}`, "_blank");
-    win.focus();
-  };
-};
+// const removeResume = (resumeId) => {
+//   return (event) => {
+//     const confirmDelete = window.confirm(
+//       "Are you sure to delete the resume? Deleted resume can't be recovered."
+//     );
 
-const editResume = (resumeId) => {
-  return (event) => {
-    const win = window.open(`/resume/${resumeId}`, "_blank");
-    win.focus();
-  };
-};
+//     if (!confirmDelete) return false;
 
-const sortData = (arr, orderDirection, label) => {
-  if (orderDirection === "asc") {
-    return arr.sort((a, b) => {
-      if (!a[label]) a = a.resume;
-      if (!b[label]) b = b.resume;
-      return a[label] > b[label] ? 1 : b[label] > a[label] ? -1 : 0;
-    });
-  }
-  return arr.sort((a, b) => {
-    if (!a[label]) a = a.resume;
-    if (!b[label]) b = b.resume;
-    return a[label] < b[label] ? 1 : b[label] < a[label] ? -1 : 0;
-  });
-};
+//     const response = ResumeService.deleteResume(resumeId);
+
+//     response
+//       .then((data) => {
+//         const updatedAllRows = allRows.filter(
+//           (row) => row.resume.id !== resumeId
+//         );
+
+//         const updatedRows = rows.filter((row) => row.resume.id !== resumeId);
+
+//         setAllRows(updatedAllRows);
+//         setRows(updatedRows);
+//         setSelection((prev) => ({
+//           ...prev,
+//           severity: "success",
+//           message: data,
+//         }));
+//       })
+//       .catch((error) => {
+//         console.error("Error:", error.message);
+//         setSelection((prev) => ({
+//           ...prev,
+//           severity: "error",
+//           message: error.message,
+//         }));
+//       });
+//   };
+// };
 
 // const resp = [
 //   {

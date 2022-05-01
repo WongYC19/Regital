@@ -5,6 +5,7 @@ export default function SearchBar(props) {
   const {
     id = "outlined-search",
     label = "Search field",
+    variant = "contained",
     value,
     onChange = () => {},
     onCancelSearch = () => {},
@@ -17,7 +18,15 @@ export default function SearchBar(props) {
       value={value}
       label={label}
       type="text"
-      sx={{ borderColor: (theme) => theme.palette.secondary.main }}
+      variant={variant}
+      autoFocus
+      notched
+      sx={{
+        borderColor: (theme) => theme.palette.secondary.main,
+        "& legend": {
+          visibility: "visible",
+        },
+      }}
       onChange={onChange}
       endAdornment={
         <InputAdornment position="end">

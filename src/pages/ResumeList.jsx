@@ -24,8 +24,6 @@ import {
 } from "@mui/icons-material";
 
 import Moment from "react-moment";
-import ResumeService from "../services/resume.service";
-import ProfileService from "../services/profile.service";
 import AllowedUserList from "../components/AllowedUserList";
 import Popout from "../components/Popout";
 import ShareDialog from "../components/ShareDialog";
@@ -34,8 +32,18 @@ import StyledIconButton from "../components/StyledIconButton";
 import AlertBox from "../components/AlertBox";
 import SelectUsers from "../components/SelectUsers";
 
-import * as html2canvas from "html2canvas";
-import jsPDF from "jspdf";
+import sortData from "../utils/sorter";
+import {
+  getUsers,
+  getResumeList,
+  editResume,
+  publishResume,
+  downloadResume,
+  removeResume,
+  toggleAccess,
+  closePublish,
+} from "../utils/resumeOperation";
+
 import {
   StyledTableRow,
   StyledTableCell,
@@ -44,13 +52,17 @@ import {
 
 function CustomResumeList(props) {
   const {
-    data: resumeList,
+    selection,
+    setSelection,
+    resumeList,
+    setResumeList,
     editResume = () => {},
     downloadResume = () => {},
     removeResume = () => {},
     toggleAccess = () => {},
     publishResume = () => {},
   } = props;
+
   return resumeList.map((item) => {
     let {
       id,
@@ -61,6 +73,7 @@ function CustomResumeList(props) {
       resume_id: resumeId,
       view_id: viewId,
     } = item;
+
     return (
       <StyledTableRow key={id}>
         <StyledTableCell>{template}</StyledTableCell>
@@ -87,7 +100,16 @@ function CustomResumeList(props) {
 
         <StyledTableCell>
           <Tooltip title="Manage the permissions">
-            <StyledIconButton onClick={toggleAccess(resumeId, permissions)}>
+            <StyledIconButton
+              onClick={toggleAccess({
+                selection,
+                setSelection,
+                resumeList,
+                setResumeList,
+                resumeId,
+                inputRight: permissions,
+              })}
+            >
               <GroupIcon />
             </StyledIconButton>
           </Tooltip>
@@ -97,7 +119,9 @@ function CustomResumeList(props) {
           <Tooltip
             title={viewId ? "Refresh for new link" : "Create a new link"}
           >
-            <StyledIconButton onClick={publishResume(resumeId, viewId)}>
+            <StyledIconButton
+              onClick={publishResume({ setSelection, resumeId, viewId })}
+            >
               {viewId ? <PublishedWithChangesIcon /> : <UnpublishedIcon />}
             </StyledIconButton>
           </Tooltip>
@@ -113,7 +137,14 @@ function CustomResumeList(props) {
 
         <StyledTableCell>
           <Tooltip title="Delete the resume">
-            <StyledIconButton onClick={removeResume(resumeId)}>
+            <StyledIconButton
+              onClick={removeResume({
+                resumeList,
+                setResumeList,
+                setSelection,
+                resumeId,
+              })}
+            >
               <DeleteForeverIcon />
             </StyledIconButton>
           </Tooltip>
@@ -131,6 +162,7 @@ export default function ResumeList(props) {
     showPublish: false,
     resumeId: null,
     viewId: null,
+    anchorEl: null,
     severity: "success",
     message: null,
     loading: false,
@@ -147,205 +179,31 @@ export default function ResumeList(props) {
     "Remove",
   ];
 
+  const sortableFields = ["Created Date", "Last Modified Date"];
+
+  const initialOrderDirection = sortableFields.reduce((obj, field) => {
+    obj[field] = "asc";
+    return obj;
+  }, {});
+
+  const [orderDirection, setOrderDirection] = useState(initialOrderDirection);
+
+  const handleSortRequest = (field, label) => {
+    return () => {
+      const sortedResume = sortData(resumeList, orderDirection[field], label);
+      setResumeList(sortedResume);
+      setOrderDirection((prev) => ({
+        ...prev,
+        [field]: orderDirection[field] === "asc" ? "desc" : "asc",
+      }));
+    };
+  };
+
   useEffect(() => {
-    async function getResumeList() {
-      const response = await ResumeService.getResumeList();
-      setResumeList(response);
-      setSelection((prev) => ({ ...prev, loading: true }));
-    }
-
-    async function getUsers() {
-      const userData = await ProfileService.getUsers();
-      setUserList(userData);
-    }
-
     const isLoading = selection.loading;
-
-    if (!isLoading) getResumeList();
-    getUsers();
+    if (!isLoading) getResumeList({ setResumeList, setSelection });
+    getUsers(setUserList);
   }, [selection.loading]);
-
-  const editResume = (resumeId) => {
-    return (event) => {
-      const win = window.open(`/resume/${resumeId}`, "_blank");
-      win.focus();
-    };
-  };
-
-  const publishResume = (resumeId, viewId) => {
-    return (event) => {
-      setSelection((prev) => ({
-        ...prev,
-        resumeId,
-        viewId,
-        showPublish: true,
-      }));
-    };
-  };
-
-  const downloadResume = (resumeId) => {
-    return (event) => {
-      const container = document.querySelector("#resume");
-
-      let option = {
-        useCORS: true,
-        width: window.screen.availWidth,
-        height: window.screen.availHeight,
-        windowWidth: document.body.scrollWidth,
-        windowHeight: document.body.scrollHeight,
-        x: 0,
-        y: window.pageYOffset,
-        // html2canvas: { scale: 2 },
-        // jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
-      };
-      // Alerts: asdjkll
-      // html2pdf().set(option).from(element).save();
-      // console.log("Element:", element);
-
-      html2canvas(container, option).then((canvas) => {
-        // document.body.appendChild(canvas);
-        console.log("Canvas:", canvas);
-        const imgData = canvas.toDataURL("image/png");
-        const pdf = new jsPDF();
-        console.log("Img Data:", imgData);
-        pdf.addImage(imgData, "PNG", 0, 0);
-        pdf.save("resume.pdf");
-      });
-    };
-  };
-
-  const removeResume = (resumeId) => {
-    return (event) => {
-      const confirmDelete = window.confirm(
-        "Are you sure to delete the resume? Deleted resume can't be recovered."
-      );
-
-      if (!confirmDelete) return false;
-
-      const response = ResumeService.deleteResume(resumeId);
-
-      response
-        .then((data) => {
-          const updatedList = resumeList.filter(
-            (item) => item.resume_id !== resumeId
-          );
-          setResumeList(updatedList);
-          setSelection((prev) => ({
-            ...prev,
-            severity: "success",
-            message: data,
-          }));
-        })
-        .catch((error) => {
-          setSelection((prev) => ({
-            ...prev,
-            severity: "error",
-            message: error.message,
-          }));
-        });
-    };
-  };
-
-  const toggleAccess = (resumeId) => {
-    return (event) => {
-      const anchorEl = selection.anchorEl ? null : event.currentTarget;
-      const resume = resumeList.find((resume) => resume.resume_id === resumeId);
-      const allowedUsers = resume.permissions;
-
-      function updatePermission(allowedUserId, inputRight) {
-        let accessResponse = null;
-        if (inputRight === "null") {
-          accessResponse = ResumeService.revokePermission(
-            resumeId,
-            allowedUserId
-          );
-        } else {
-          accessResponse = ResumeService.grantPermission(
-            resumeId,
-            allowedUserId,
-            inputRight
-          );
-        }
-
-        accessResponse
-          .then((data) => {
-            setResumeList((prev) => {
-              const resumeIndex = prev.findIndex(
-                (resume) => resume.resume_id === resumeId
-              );
-              const allowedUsers = resume.permissions;
-
-              // Revoke access right
-              if (inputRight === "null") {
-                let permissions = prev[resumeIndex].permissions;
-
-                permissions = permissions.filter(
-                  (p) => p.user !== allowedUserId
-                );
-                prev[resumeIndex].permissions = permissions;
-
-                setSelection((prevSelection) => ({
-                  ...prevSelection,
-                  allowedUsers: permissions,
-                  message:
-                    data.message ?? "Revoke user access right successfully.",
-                  severity: "success",
-                }));
-                return prev;
-              }
-
-              // Update access right
-              const userIndex = allowedUsers.findIndex(
-                (p) => p.user === allowedUserId
-              );
-
-              if (userIndex === -1) {
-                const newAllowedUser = data;
-                const newAllowedUsers = prev[resumeIndex].permissions.concat([
-                  newAllowedUser,
-                ]);
-                prev[resumeIndex].permissions = newAllowedUsers;
-
-                setSelection((prevSelection) => ({
-                  ...prevSelection,
-                  allowedUsers: newAllowedUsers,
-                  message:
-                    data.message ?? "Granted view access right to new user.",
-                  severity: "success",
-                }));
-                return prev;
-              }
-
-              prev[resumeIndex].permissions[userIndex].right = inputRight;
-              setSelection((prevSelection) => ({
-                ...prevSelection,
-                message: data.message ?? "Update the access right successfuly.",
-                severity: "success",
-              }));
-              return prev;
-            });
-          })
-          .catch((error) => {
-            setSelection((prev) => ({
-              ...prev,
-              message: error.message,
-              severity: "error",
-            }));
-          });
-      }
-
-      setSelection((prev) => ({
-        ...prev,
-        resumeId,
-        showAccess: anchorEl,
-        updatePermission,
-        allowedUsers,
-      }));
-    };
-  };
-
-  const closePublish = () =>
-    setSelection((prev) => ({ ...prev, showPublish: false }));
 
   return (
     <Layout>
@@ -353,7 +211,6 @@ export default function ResumeList(props) {
         container
         gap={3}
         mt={10}
-        // ml={5}
         ml={3}
         justifyContent="flex-start"
         alignItems="center"
@@ -366,10 +223,16 @@ export default function ResumeList(props) {
             <TableHead>
               <StyledTableRow>
                 {fields.map((item) => {
-                  if (["Created Date", "Last Modified Date"].includes(item)) {
+                  if (sortableFields.includes(item)) {
                     return (
-                      <StyledTableCell key={item}>
-                        <TableSortLabel active={true} direction={"asc"}>
+                      <StyledTableCell
+                        key={item}
+                        onClick={handleSortRequest(item, "created_date")}
+                      >
+                        <TableSortLabel
+                          active={true}
+                          direction={orderDirection[item]}
+                        >
                           {item}
                         </TableSortLabel>
                       </StyledTableCell>
@@ -384,7 +247,7 @@ export default function ResumeList(props) {
               <Popout
                 title="Share your resume"
                 openPopup={selection.showPublish}
-                closePopup={closePublish}
+                closePopup={() => closePublish(setSelection)}
               >
                 <ShareDialog {...{ selection, setResumeList }} />
               </Popout>
@@ -431,7 +294,10 @@ export default function ResumeList(props) {
               ) : (
                 <CustomResumeList
                   {...{
-                    data: resumeList,
+                    resumeList,
+                    setResumeList,
+                    selection,
+                    setSelection,
                     editResume,
                     removeResume,
                     toggleAccess,

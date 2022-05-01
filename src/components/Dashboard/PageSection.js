@@ -31,7 +31,7 @@ function TemplateCard(props) {
           if (resumeId) window.open(`/resume/${resumeId}`, "_blank");
         })
         .catch((error) => {
-          console.log("Create resume error:", error);
+          console.error("Create resume error:", error.message);
         });
     };
   };
