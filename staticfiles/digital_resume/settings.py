@@ -38,16 +38,16 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 SECURE_HSTS_SECONDS = 60
 
-ALLOWED_HOSTS = ['localhost:3000', '127.0.1:3000']
+ALLOWED_HOSTS = []
 
 if DEBUG:
-    ALLOWED_HOSTS += [os.environ.get("ALLOWED_HOSTS")]
+    ALLOWED_HOSTS += [os.environ.get("ALLOWED_HOSTS"), 'localhost:3000', '127.0.1:3000']
     SESSION_COOKIE_SECURE = False
     CSRF_COOKIE_SECURE = False
     SECURE_SSL_REDIRECT= False
     SECURE_HSTS_PRELOAD = False
 else:
-    ALLOWED_HOSTS = ["https://regital.herokuapp.com"]
+    ALLOWED_HOSTS = ["https://regital.herokuapp.com", 'localhost:3000', '127.0.1:3000']
 
 # Application definition
 INSTALLED_APPS = [
@@ -156,12 +156,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # STATICFILES_STORAGE =  'django.contrib.staticfiles.storage.StaticFilesStorage' 
 
-STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"), os.path.join(BASE_DIR, "build/static"))
+STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"), os.path.join(BASE_DIR, "build/static"), BASE_DIR)
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "static")
 MEDIA_URL = "/images/"
@@ -191,13 +191,12 @@ AUTH_USER_MODEL = "main.CustomUser"
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOWED_ORIGINS = []
 
-CORS_ALLOWED_ORIGINS += [
-    os.environ.get("FRONTEND_ORIGIN"),
-    os.environ.get("BACKEND_ORIGIN")
-]
-
 if DEBUG:
-    CORS_ALLOWED_ORIGINS += ["https://regital.herokuapp.com"]
+    CORS_ALLOWED_ORIGINS += [os.environ.get("FRONTEND_ORIGIN"),
+    os.environ.get("BACKEND_ORIGIN", "localhost:3000")]
+
+print("CORS Allowed Origin:", CORS_ALLOWED_ORIGINS)
+
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),

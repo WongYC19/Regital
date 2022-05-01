@@ -4,8 +4,6 @@ import { Avatar } from "@mui/material";
 import { AuthContext } from "../../contexts/AuthContext";
 import { useContext } from "react";
 
-const BASE_URL = "http://localhost:8000";
-
 export default function ProfilePicture(props) {
   const { userProfile, logoutUser } = useContext(AuthContext);
 
@@ -16,7 +14,7 @@ export default function ProfilePicture(props) {
   // fullName = "Anonymous User";
   const imageURL =
     profilePicture !== "" || profilePicture === null
-      ? `${BASE_URL}${profilePicture}`
+      ? `${profilePicture}`
       : null;
   const innerProps = { ...stringAvatar(fullName) };
   if (imageURL) innerProps["src"] = imageURL;
