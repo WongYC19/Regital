@@ -69,7 +69,6 @@ function CustomResumeList(props) {
       title: template,
       last_modified_date: lastModifiedDate,
       created_date: createdDate,
-      permissions,
       resume_id: resumeId,
       view_id: viewId,
     } = item;

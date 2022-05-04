@@ -3,7 +3,6 @@ import {
   List,
   ListItem,
   ListItemAvatar,
-  Divider,
   Typography,
 } from "@mui/material";
 
