@@ -107,7 +107,6 @@ function CustomResumeList(props) {
                 resumeList,
                 setResumeList,
                 resumeId,
-                inputRight: permissions,
               })}
             >
               <GroupIcon />
@@ -166,6 +165,7 @@ export default function ResumeList(props) {
     severity: "success",
     message: null,
     loading: false,
+    allowedUsers: null,
   });
 
   const fields = [
@@ -207,6 +207,53 @@ export default function ResumeList(props) {
 
   return (
     <Layout>
+      <Popout
+        title="Share your resume"
+        openPopup={selection.showPublish}
+        closePopup={() => closePublish(setSelection)}
+      >
+        <ShareDialog {...{ selection, setResumeList }} />
+      </Popout>
+
+      <UserAccessControl anchorEl={selection.showAccess} sx={{ p: 1 }}>
+        <Paper color="secondary">
+          <Grid container alignItems="center">
+            <Grid item flexGrow={1} sx={{ pl: 1 }}>
+              <Typography variant="h6" sx={{ p: 1 }}>
+                User Access Control
+              </Typography>
+            </Grid>
+
+            <Grid item sx={{ pr: 1 }}>
+              <StyledIconButton
+                onClick={() =>
+                  setSelection((prev) => ({
+                    ...prev,
+                    showAccess: null,
+                  }))
+                }
+              >
+                <CloseIcon />
+              </StyledIconButton>
+            </Grid>
+          </Grid>
+
+          <SelectUsers
+            userList={userList}
+            allowedUsers={selection.allowedUsers}
+            updatePermission={selection.updatePermission}
+          />
+
+          <Divider sx={{ mt: 1, height: "10px" }} />
+
+          <AllowedUserList
+            allowedUsers={selection.allowedUsers}
+            updatePermission={selection.updatePermission}
+            resumeId={selection.resumeId}
+          />
+        </Paper>
+      </UserAccessControl>
+
       <Grid
         container
         gap={3}
@@ -218,6 +265,7 @@ export default function ResumeList(props) {
       >
         <Typography variant="h5">Resume List</Typography>
         <AlertBox variant="contained" {...{ selection, setSelection }} />
+
         <TableContainer>
           <Table>
             <TableHead>
@@ -244,51 +292,6 @@ export default function ResumeList(props) {
             </TableHead>
 
             <TableBody>
-              <Popout
-                title="Share your resume"
-                openPopup={selection.showPublish}
-                closePopup={() => closePublish(setSelection)}
-              >
-                <ShareDialog {...{ selection, setResumeList }} />
-              </Popout>
-
-              <UserAccessControl anchorEl={selection.showAccess} sx={{ p: 1 }}>
-                <Paper color="secondary">
-                  <Grid container alignItems="center">
-                    <Grid item flexGrow={1} sx={{ pl: 1 }}>
-                      <Typography variant="h6" sx={{ p: 1 }}>
-                        User Access Control
-                      </Typography>
-                    </Grid>
-
-                    <Grid item sx={{ pr: 1 }}>
-                      <StyledIconButton
-                        onClick={() =>
-                          setSelection((prev) => ({
-                            ...prev,
-                            showAccess: null,
-                          }))
-                        }
-                      >
-                        <CloseIcon />
-                      </StyledIconButton>
-                    </Grid>
-                  </Grid>
-
-                  <SelectUsers
-                    userList={userList}
-                    allowedUsers={selection.allowedUsers}
-                    updatePermission={selection.updatePermission}
-                  />
-                  <Divider sx={{ mt: 1 }} />
-                  <AllowedUserList
-                    allowedUsers={selection.allowedUsers}
-                    updatePermission={selection.updatePermission}
-                    resumeId={selection.resumeId}
-                  />
-                </Paper>
-              </UserAccessControl>
-
               {resumeList.length === 0 ? (
                 <StyledEmptyRows columnCounts={8} />
               ) : (

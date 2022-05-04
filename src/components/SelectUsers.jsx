@@ -31,19 +31,17 @@ export default function SelectUsers(props) {
           autoComplete: "new-password",
         }}
         label="Select a user"
+        sx={{ ml: 2, width: "80%" }}
       />
     );
   };
 
   const changeUser = (event, value) => {
-    console.log(event, value);
-
     try {
       const { id: userId } = value;
-      console.log("Value:", value);
       updatePermission(userId, 0);
     } catch (error) {
-      console.log(`Error: ${error.message}`);
+      console.warn(`Error in selecting user: ${error.message}`);
     }
   };
 
@@ -55,6 +53,7 @@ export default function SelectUsers(props) {
       renderOption={renderOption}
       renderInput={renderInput}
       onChange={changeUser}
+      sx={{ p: 0, m: 0 }}
     />
   );
 }

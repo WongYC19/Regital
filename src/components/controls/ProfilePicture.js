@@ -1,6 +1,5 @@
 import stringAvatar from "../../utils/stringAvatar";
 import { Avatar } from "@mui/material";
-// import AuthService from "../../services/auth.service";
 import { AuthContext } from "../../contexts/AuthContext";
 import { useContext } from "react";
 
@@ -11,7 +10,7 @@ export default function ProfilePicture(props) {
   let fullName = firstName + " " + lastName;
 
   if (!fullName) logoutUser();
-  // fullName = "Anonymous User";
+
   const imageURL =
     profilePicture !== "" || profilePicture === null
       ? `${profilePicture}`

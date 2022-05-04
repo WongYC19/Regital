@@ -22,7 +22,6 @@ export default function SelectRights(props) {
   const onSelect = (event) => {
     const selectedRight = event.target.value;
     setLoading(true);
-
     try {
       updatePermission(userId, selectedRight);
       setSelectedRight(selectedRight);
@@ -41,13 +40,17 @@ export default function SelectRights(props) {
           id={`select-${resumeId}`}
           value={selectedRight}
           onChange={onSelect}
+          variant="standard"
+          sx={{
+            borderRadius: "5px",
+          }}
         >
           {RIGHTS.map((item) => {
             const [rightValue, title, Icon] = item;
             return (
               <MenuItem key={rightValue} value={rightValue}>
                 <InputLabel>
-                  <Icon sx={{ mr: 1 }} /> {title}
+                  <Icon sx={{ mr: 0.5 }} /> {title}
                 </InputLabel>
               </MenuItem>
             );

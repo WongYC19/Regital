@@ -37,25 +37,29 @@ export default function AllowedUserList(props) {
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
+              padding: 1,
             }}
           >
             <ListItemAvatar>
-              <Avatar {...avatarProps} />
+              <Avatar
+                {...avatarProps}
+                sx={{ p: 0, m: 0, width: 40, height: 40 }}
+              />
             </ListItemAvatar>
+
             <Typography
-              variant="h6"
-              sx={{ ml: 1, mr: 3, flexGrow: 1 }}
+              variant="string"
+              sx={{ ml: 0, mr: 3, flexGrow: 1 }}
               primary={fullName}
             >
               {fullName}
             </Typography>
+
             <SelectRights
-              sx={{ alignSelf: "flex-end", justifySelf: "flex-end" }}
               userId={userId}
               updatePermission={updatePermission}
               right={right}
             />
-            <Divider />
           </ListItem>
         );
       })}

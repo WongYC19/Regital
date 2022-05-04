@@ -19,7 +19,6 @@ class ProfileService {
     let { profilePicture, ...dataWithoutFileField } = data;
     const snakeData = camelToSnakeObject(dataWithoutFileField);
     const response = await api.put(api.endpoints.userProfile, snakeData);
-    console.log("Update user profile data:", response);
     let camelData = response.data ?? {};
     camelData = { ...camelData, ...data };
     return camelData;
@@ -44,14 +43,12 @@ class ProfileService {
     );
 
     const snakeData = snakeToCamelObject(response.data ?? {});
-    console.log("Data in updateProfilePicture:", snakeData);
     return snakeData;
   };
 
   deleteProfilePicture = async (event) => {
     const response = await api.delete(api.endpoints.userProfile);
     const camelData = snakeToCamelObject(response.data ?? {});
-    console.log("Data in deleteProfilePicture:", camelData);
     return camelData;
   };
 
