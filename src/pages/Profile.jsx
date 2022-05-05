@@ -44,7 +44,7 @@ function ProfileForm() {
   async function deleteProfilePicture(event) {
     const response = await ProfileService.deleteProfilePicture(event);
     if (response.profilePicture) {
-      const data = { profilePicture: "/images/profiles" };
+      const data = { profilePicture: "/static/profiles" };
       setUserProfile((prev) => ({ ...prev, ...data }));
     }
 

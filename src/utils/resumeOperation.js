@@ -59,7 +59,6 @@ export function downloadResume(resumeId) {
     // html2pdf().set(option).from(element).save();
 
     html2canvas(container, option).then((canvas) => {
-      console.log("Canvas:", canvas);
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF();
       pdf.addImage(imgData, "PNG", 0, 0);
@@ -148,26 +147,22 @@ async function grantPermission({
   resumeId,
   userId,
   inputRight,
-  resume,
   setSelection,
   setResumeList,
 }) {
   try {
-    const accessResponse = await ResumeService.grantPermission(
+    const newAllowedUser = await ResumeService.grantPermission(
       resumeId,
       userId,
       inputRight
     );
 
-    const allowedUsers = resume.permissions;
-    const newAllowedUser = accessResponse.allowed_user;
     setResumeList((prev) => {
       const resumeIndex = prev.findIndex(
         (resume) => resume.resume_id === resumeId
       );
-
+      const allowedUsers = prev[resumeIndex].permissions;
       const userIndex = allowedUsers.findIndex((p) => p.user === userId);
-
       // if user is not allow before, then add the user to the list
       if (userIndex === -1) {
         const newAllowedUsers = prev[resumeIndex].permissions.concat([
@@ -186,12 +181,14 @@ async function grantPermission({
 
       prev[resumeIndex].permissions[userIndex].right = inputRight;
 
-      console.log("NEw alloweduser:", newAllowedUser);
       updateSetter(setSelection, {
         message: `Updated access right for user ${
-          newAllowedUser.first_name + " " + newAllowedUser?.last_name
+          newAllowedUser.allowed_user.first_name +
+          " " +
+          newAllowedUser.allowed_user.last_name
         }.`,
         severity: "success",
+        allowedUsers: prev[resumeIndex].permissions,
       });
 
       return prev;
@@ -240,6 +237,7 @@ export function toggleAccess({
     const allowedUsers = resume.permissions;
     // const allowedUserId = allowedUsers.imgData;
 
+    // updateSetter(setSelection, { allowedUsers: allowedUsers });
     const updatePermission = permissionSetter({
       resumeId,
       resume,
@@ -253,7 +251,7 @@ export function toggleAccess({
       resumeId,
       showAccess: anchorEl,
       updatePermission,
-      allowedUsers,
+      allowedUsers: allowedUsers,
     });
   };
 }

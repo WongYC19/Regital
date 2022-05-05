@@ -14,14 +14,14 @@ export default function AllowedUserList(props) {
   return (
     <List dense>
       {allowedUsers.map((item) => {
-        const { id, allowed_user: allowedUser, right } = item;
-
+        const { id, allowed_user: allowedUser, right = 0 } = item;
         const {
           first_name: firstName,
           last_name: lastName,
           profile_picture: profilePicture,
           id: userId,
         } = allowedUser;
+
         const fullName = firstName + " " + lastName;
 
         let avatarProps = {

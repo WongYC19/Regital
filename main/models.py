@@ -31,4 +31,4 @@ class CustomUser(AbstractUser):
     objects = CustomUserManager() # specified  all objects for the class come from the CustomUserManager
     
     def __str__(self):
-        return f"Custom user model: {self.email}"
+        return f"User email: {self.email}"
