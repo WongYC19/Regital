@@ -72,6 +72,10 @@ const changePasswordSchema = Yup.object().shape({
   newPassword: Yup.string()
     .required("Password is required")
     .min(8, "Password length should be at least 8 characters")
+    .notOneOf(
+      [Yup.ref("oldPassword")],
+      "Must be different from current password."
+    )
     .matches(
       passwordRule,
       "Password must contains numbers, upper and lower case characters, and symbols."

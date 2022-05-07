@@ -146,8 +146,13 @@ function ProfileForm() {
 }
 
 function ChangePasswordForm() {
-  const { changePassword } = useContext(AuthContext);
+  // const { changePassword } = useContext(AuthContext);
   const CSRFToken = AuthService.CSRFToken;
+
+  async function changePassword(data) {
+    const changePasswordResponse = await ProfileService.changePassword(data);
+    return changePasswordResponse;
+  }
 
   return (
     <Control.Form
@@ -219,12 +224,13 @@ function Profile() {
         justifyContent="center"
         alignContent="center"
         direction="column"
+        mt={10}
       >
         <Grid item>
-          <ProfileForm></ProfileForm>
+          <ProfileForm />
         </Grid>
         <Grid item>
-          <ChangePasswordForm></ChangePasswordForm>
+          <ChangePasswordForm />
         </Grid>
       </Grid>
     </Layout>
