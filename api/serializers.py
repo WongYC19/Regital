@@ -1,15 +1,21 @@
 # from main.models import CustomUser as User
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.tokens import default_token_generator
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+
+from django.contrib.auth.models import BaseUserManager
 from rest_framework import status
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from django.utils.encoding import force_bytes, force_str
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+
+# from django.conf import settings
 from django.core.mail import send_mail, BadHeaderError
-from django.contrib.auth.models import BaseUserManager
+# from sendgrid import SendGridAPIClient
+# from sendgrid.helpers.mail import Mail
 
 User = get_user_model()
 
@@ -133,13 +139,11 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
            
 class ResetPasswordSerializer(serializers.ModelSerializer, BaseUserManager):
     email = serializers.EmailField()
-    SUBJECT = "Password Reset Requested - The Regital"
     
     class Meta:
         model = User
         fields = ("email", )
-    
-
+        
     def get_email_text(self, email_config):
         url =  email_config['domain']
         return f"""
@@ -157,7 +161,7 @@ class ResetPasswordSerializer(serializers.ModelSerializer, BaseUserManager):
             The Regital Team
 
         """
-
+    
     def get_email_config(self, request, user): 
         return {
             "email": user.email,
@@ -165,32 +169,40 @@ class ResetPasswordSerializer(serializers.ModelSerializer, BaseUserManager):
             'site_name': 'Regital',
             "uid": urlsafe_base64_encode(force_bytes(user.pk)),
             'token': default_token_generator.make_token(user),
-            'protocol': 'http',
+            'protocol': 'https',
         }
-        
-
+    
     def validate_email(self, email):
         email = self.normalize_email(email)
         user = User.objects.filter(email=email).first()
-        request = self.context['request']
         
         if not user:
-            raise serializers.ValidationError("User email is invalid.", code=status.HTTP_400_BAD_REQUEST)
-            return email 
+            raise serializers.ValidationError("User email is invalid.", code=status.HTTP_400_BAD_REQUEST)                    
         
+        request = self.context['request']        
         email_config = self.get_email_config(request, user)
+        email_text = self.get_email_text(email_config)  
+        
+        subject = "Password Reset Requested - The Regital"
         message = self.get_email_text(email_config)
-        to_email = (user.email, )
+        from_email = settings.DEFAULT_FROM_EMAIL
+        to_email = (email, )        
+        print(subject, from_email, to_email)
         
         try:
-            send_mail(self.SUBJECT, message=message, html_message=message, from_email=None, recipient_list=to_email, fail_silently=False)
+            # send_grid = SendGridAPIClient(settings.EMAIL_HOST_PASSWORD)
+            # message = Mail(from_email=from_email, to_emails=to_email, subject=subject, html_content=message)
+            # response = send_grid.send(message)            
+            # print("Response:", response)
+            send_mail(subject, message=message, html_message=email_text, from_email=from_email, recipient_list=to_email, fail_silently=False)
         except BadHeaderError:
-            return serializers.ValidationError("Invalid header found", code=status.HTTP_400_BAD_REQUEST)
+            raise serializers.ValidationError("Invalid header found", code=status.HTTP_400_BAD_REQUEST)
         except Exception as exception:
+            print("GG:", exception)
             error_message = getattr(exception, "smtp_error", str(exception))
-            return serializers.ValidationError(error_message, code=status.HTTP_503_SERVICE_UNAVAILABLE)
-        finally:
-            return email
+            raise serializers.ValidationError(error_message, code=status.HTTP_503_SERVICE_UNAVAILABLE)        
+        
+        return email
     
 class ResetPasswordConfirmSerializer(serializers.ModelSerializer):
     new_password = serializers.CharField(validators=[validate_password])
@@ -201,7 +213,7 @@ class ResetPasswordConfirmSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ("new_password", "confirm_password", "token", "uid")
-        
+            
     def validate(self, attrs):
         print("Attrs:", attrs)
         if attrs['confirm_password'] != attrs['new_password']:

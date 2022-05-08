@@ -72,7 +72,6 @@ class RetrieveUpdateDestroyProfileView(RetrieveUpdateAPIView):
         user = request.user
         serializer = self.get_serializer(user, data=request.data, partial=True)
        
-        
         if serializer.is_valid():
             user.profile_picture.delete(save=False)
             serializer.save()            
@@ -145,13 +144,17 @@ class ResetPasswordView(UpdateAPIView):
     # queryset = User.objects.all()
     serializer_class = ResetPasswordSerializer  
     permission_classes = (AllowAny, )
-   
+            
     def post(self, request):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+        except (Exception, AttributeError) as error:
+            print("ResetPasswordView Error:", error)
+            return Response({"server": "Unexpected events happened. Please try again later."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)                          
+        
         return Response({"server": "The instruction has been sent to your mailbox, please check."}, status=status.HTTP_200_OK)
-
-      
+        
 class ResetPasswordConfirmView(UpdateAPIView):
     serializer_class = ResetPasswordConfirmSerializer
     permission_classes = (AllowAny,)
@@ -163,7 +166,6 @@ class ResetPasswordConfirmView(UpdateAPIView):
         serializer.update(instance, serializer.validated_data)
         return Response({"server": "The password has been updated successfully"}, status=status.HTTP_200_OK)
     
-                       
 class Routes(RetrieveAPIView):
     queryset = []
     
