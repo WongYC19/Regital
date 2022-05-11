@@ -190,15 +190,10 @@ class ResetPasswordSerializer(serializers.ModelSerializer, BaseUserManager):
         print(subject, from_email, to_email)
         
         try:
-            # send_grid = SendGridAPIClient(settings.EMAIL_HOST_PASSWORD)
-            # message = Mail(from_email=from_email, to_emails=to_email, subject=subject, html_content=message)
-            # response = send_grid.send(message)            
-            # print("Response:", response)
             send_mail(subject, message=message, html_message=email_text, from_email=from_email, recipient_list=to_email, fail_silently=False)
         except BadHeaderError:
             raise serializers.ValidationError("Invalid header found", code=status.HTTP_400_BAD_REQUEST)
         except Exception as exception:
-            print("GG:", exception)
             error_message = getattr(exception, "smtp_error", str(exception))
             raise serializers.ValidationError(error_message, code=status.HTTP_503_SERVICE_UNAVAILABLE)        
         

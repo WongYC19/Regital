@@ -1,7 +1,6 @@
 import axios from "axios";
 import TokenService from "./token.service";
 import AuthService from "./auth.service";
-
 export const API_URL = "/";
 
 const apiEndpoints = {
@@ -56,9 +55,13 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    if (error.response.status === 401 && !originalConfig._retry) {
+    const status = error.response.status;
+
+    if (status === 401 && !originalConfig._retry) {
+      // if ([401].includes(status) && !originalConfig._retry) {
       originalConfig._retry = true;
       const refreshToken = TokenService.getLocalRefreshToken();
+
       try {
         const newResponse = await axios.post(
           API_URL + apiEndpoints.refreshToken,
@@ -66,13 +69,25 @@ api.interceptors.response.use(
             refresh: refreshToken,
           }
         );
+
         const authObject = newResponse.data;
         TokenService.setAuth(authObject);
       } catch (exception) {
+        console.log("Auth Exception:", exception);
+        TokenService.setAuth({});
         AuthService.logout();
       }
 
       return api(originalConfig);
+    }
+
+    if (
+      status === 401 &&
+      originalConfig._retry &&
+      window.location.pathname !== "/login"
+    ) {
+      AuthService.logout();
+      window.location.href = "/login";
     }
 
     return Promise.reject(error);

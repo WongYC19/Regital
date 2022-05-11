@@ -23,18 +23,6 @@ function AuthProvider({ children }) {
   const defaultAuth = AuthService.isAuthenticated();
   const [isAuthenticated, setIsAuthenticated] = useState(defaultAuth);
 
-  useEffect(() => {
-    async function getUserProfile() {
-      const profile = await ProfileService.getUserProfile();
-      setUserProfile((prev) => ({ ...prev, ...profile }));
-    }
-
-    if (Object.keys(userProfile ?? {}).length === 0) {
-      getUserProfile();
-    }
-    return () => {};
-  });
-
   async function loginUser(data) {
     const authObject = await AuthService.login(data);
     const notEmpty = Object.keys(authObject).length > 0;
@@ -58,7 +46,7 @@ function AuthProvider({ children }) {
   }
 
   async function logoutUser(data) {
-    await AuthService.logout();
+    AuthService.logout();
     setIsAuthenticated(false);
     AuthService.cleanUp();
     history.push("/login");

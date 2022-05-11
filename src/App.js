@@ -56,7 +56,6 @@ function App() {
             component={PasswordResetDoneView}
             path="/password_reset_done"
           />
-          {/* <Route component={Resume} path="/resume" /> */}
         </AuthProvider>
       </CustomThemeProvider>
     </Router>

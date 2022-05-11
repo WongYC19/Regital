@@ -65,7 +65,6 @@ class AuthService {
         CookiesService.setCookie("csrftoken", csrftoken, 5 * 60);
       });
     }
-
     if (!csrftoken) return null;
     return <input type="hidden" name="csrfmiddlewaretoken" value={csrftoken} />;
   }
