@@ -15,6 +15,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class ResumeSerializer(serializers.ModelSerializer):
     title = serializers.CharField(source='template.title', read_only=True)
+    template_id = serializers.CharField(source='template.pk', read_only=True)
     view_id = serializers.CharField(source="publicresume.public_id", read_only=True)
     permissions = serializers.SerializerMethodField()
     

@@ -1,8 +1,8 @@
-import * as html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import ResumeService from "../services/resume.service";
 import ProfileService from "../services/profile.service";
-// import { filter } from "lodash";
+import ReactDOMServer from "react-dom/server";
+import Resume from "../pages/Resume";
 
 export async function getResumeList({ setResumeList, setSelection }) {
   const response = await ResumeService.getResumeList();
@@ -41,28 +41,39 @@ export function publishResume({ setSelection, resumeId, viewId }) {
 }
 
 export function downloadResume(resumeId) {
-  return (event) => {
-    const container = document.querySelector("#resume");
+  return async (event) => {
+    const resumeContent = await ResumeService.getResume(resumeId);
+    const data = resumeContent;
+    const initialData = data?.content ?? {};
+    const templateId = parseInt(data.template_id);
 
-    let option = {
-      useCORS: true,
-      width: window.screen.availWidth,
-      height: window.screen.availHeight,
-      windowWidth: document.body.scrollWidth,
-      windowHeight: document.body.scrollHeight,
-      x: 0,
-      y: window.pageYOffset,
-      // html2canvas: { scale: 2 },
-      // jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
+    const resumeProps = {
+      templateId: templateId,
+      editable: false,
+      showIcon: false,
+      initialData,
     };
-    // Alerts: asdjkll
-    // html2pdf().set(option).from(element).save();
 
-    html2canvas(container, option).then((canvas) => {
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF();
-      pdf.addImage(imgData, "PNG", 0, 0);
-      pdf.save("resume.pdf");
+    const resumeMarkup = ReactDOMServer.renderToStaticMarkup(
+      <Resume {...resumeProps} />
+    );
+
+    const html = `<!doctype html>
+      <html lang="en">
+        <head>
+          <meta charset="utf-8"></meta>
+        </head>
+        <body>${resumeMarkup}</body>
+      </html>`;
+
+    var doc = new jsPDF();
+    doc.html(html, {
+      html2canvas: {
+        width: 200,
+      },
+      callback: function (doc) {
+        doc.save("resume.pdf");
+      },
     });
   };
 }

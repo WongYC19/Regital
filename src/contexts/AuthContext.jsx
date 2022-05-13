@@ -1,8 +1,7 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState } from "react";
 import { useHistory, useLocation } from "react-router";
 import AuthService from "../services/auth.service";
 import TokenService from "../services/token.service";
-import ProfileService from "../services/profile.service";
 import api from "../services/api";
 import { snakeToCamelObject } from "../utils/caseConversion";
 import useLocalStorage from "../hooks/useLocalStorage";

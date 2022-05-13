@@ -15,16 +15,16 @@ export function ThemeTogglerIcon() {
     padding: theme.spacing(1),
 
     "& .MuiSvgIcon-root": {
-      fontSize: 2.5 * theme.typography.fontSize,
+      fontSize: "40px",
     },
   }));
 
   const SunIcon = styled(Brightness7)(({ theme }) => ({
-    color: theme.palette.toggleIcon.main,
+    color: theme.palette.toggleIcon?.main,
   }));
 
   const MoonIcon = styled(Brightness4)(({ theme }) => ({
-    color: theme.palette.toggleIcon.main,
+    color: theme.palette.toggleIcon?.main,
   }));
 
   return (

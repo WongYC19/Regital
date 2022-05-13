@@ -18,6 +18,9 @@ import {
   PasswordResetDoneView,
 } from "./pages/PasswordReset";
 
+import React from "react";
+React.useLayoutEffect = React.useEffect;
+
 function App() {
   return (
     <Router>

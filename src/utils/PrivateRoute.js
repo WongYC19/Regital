@@ -4,22 +4,22 @@ import { AuthContext } from "../contexts/AuthContext";
 import ProfileService from "../services/profile.service";
 
 function PrivateRoute({ component: Component, ...rest }) {
-  const { isAuthenticated, userProfile, setUserProfile, logoutUser } =
+  const { isAuthenticated, userProfile, setUserProfile } =
     useContext(AuthContext);
 
-  async function getUserProfile() {
-    try {
-      const profile = await ProfileService.getUserProfile();
-      setUserProfile((prev) => ({ ...prev, ...profile }));
-    } catch (error) {}
-  }
-
   useEffect(() => {
-    if (Object.keys(userProfile ?? {}).length === 0) {
+    async function getUserProfile() {
+      try {
+        const profile = await ProfileService.getUserProfile();
+        setUserProfile((prev) => ({ ...prev, ...profile }));
+      } catch (error) {}
+    }
+
+    if (isAuthenticated && Object.keys(userProfile ?? {}).length === 0) {
       getUserProfile();
     }
     return () => {};
-  }, [userProfile, setUserProfile, isAuthenticated, getUserProfile]);
+  }, [isAuthenticated]);
 
   return (
     <Route

@@ -44,6 +44,7 @@ export default function Classic(props) {
         type="text/css"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css"
       />
+      <link rel="stylesheet" type="text/css" href="../../static/classic.css" />
 
       <link
         rel="stylesheet"
